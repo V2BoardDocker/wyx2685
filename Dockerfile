@@ -28,6 +28,8 @@ COPY ./httpd.conf /etc/nginx/http.d/default.conf
 COPY ./data/config.php.example /www/config/v2board.php
 RUN chown -R www /www
 
+RUN mkdir /data
+
 EXPOSE 80
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
