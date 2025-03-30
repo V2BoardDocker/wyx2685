@@ -29,6 +29,7 @@ COPY ./data/config.php.example /www/config/v2board.php
 RUN chown -R www /www
 
 RUN mkdir /data
+RUN chown -R www /data
 
 EXPOSE 80
 
