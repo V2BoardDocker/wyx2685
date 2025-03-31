@@ -1,26 +1,69 @@
 # Docker版安装教程
 
-本构建分为全新安装和恢复安装
+> [!IMPORTANT]  
+> 这不是官方的V2Board/Xboard仓库
 
-如果你没有使用network，请移除指令中的 ` --network 1panel-network `，以及 ` docker-compose.yml ` 中的 ` network ` 标签
+以下内容中，如果你没有使用1panel-network，请移除指令中的 `--network 1panel-network`，以及 `docker-compose.yml` 中的 `network` 标签
+
+## 快速安装
+
+1. 准备持久化的文件
+
+```shell
+mkdir -p ./data
+wget "https://raw.githubusercontent.com/V2BoardDocker/wyx2685/refs/heads/main/data/config.env.example" -O ./data/config.env
+wget "https://raw.githubusercontent.com/V2BoardDocker/wyx2685/refs/heads/main/data/config.php.example" -O ./data/config.php
+```
+
+2. 导入数据库、注册管理员账户
+
+> [!NOTE]
+> 如果你没有使用1panel-network，请移除指令中的 `--network 1panel-network`
+
+```shell
+docker run --rm -it --network 1panel-network \
+-v ./data/config.env:/www/config.env \
+--entrypoint sh \
+ghcr.io/v2boarddocker/wyx2685:latest \
+"-c" "php artisan v2board:install && cat /www/.env > /www/config.env"
+```
+
+3. 运行容器
+
+```shell
+docker run -d --network 1panel-network \
+-v ./data/config.env:/www/.env \
+-v ./data/config.php:/www/config/v2board.php \
+-v ./data:/data \
+-p 49992:80 \
+ghcr.io/v2boarddocker/wyx2685:latest 
+```
+
+4. 打开浏览器看看吧
+
+不出意外，你的面板将在49992端口可用。
+
+你可以将其绑定到 `127.0.0.1:49992` 来避免公网访问
+
+## 手动构建镜像
 
 ### 全新安装
 
 1. 构建镜像
 
-    ```bash
+    ```shell
     docker build -t wyx .
     ```
 
 2. 导入数据库、注册管理员账户
 
-    ```bash
+    ```shell
     docker run --rm -it --network 1panel-network -v ./data/config.env:/www/config.env --entrypoint sh wyx "-c" "php artisan v2board:install && cat /www/.env > /www/config.env"
     ```
 
 3. 启动
 
-    ```bash
+    ```shell
     docker-compose up -d
     ```
 
@@ -28,7 +71,7 @@
 
 1. 构建镜像
 
-    ```bash
+    ```shell
     docker build -t wyx .
     ```
 
@@ -38,7 +81,7 @@
 
 3. 启动
 
-    ```bash
+    ```shell
     docker-compose up -d
     ```
 
@@ -50,14 +93,14 @@
 
     请在容器内部执行
 
-    ```bash
+    ```shell
     chmod 755 /www
     chown www /www
     ```
 
     快速操作
 
-    ```bash
+    ```shell
     docker exec <容器ID或容器名称> chmod 755 /www
     docker exec <容器ID或容器名称> chown www /www
     ```
